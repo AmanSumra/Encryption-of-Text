@@ -1,0 +1,51 @@
+public class TextEncryptionDecryption {
+
+  private static final String ALGORITHM = "AES";
+  public static String encrypt(String plainText, SecretKey secretKey) throws Exception {
+    Cipher cipher = Cipher.getInstance(ALGORITHM);
+    cipher.init(Cipher.ENCRYPT_MODE, secretKey);
+    byte[] encryptedBytes = cipher.doFinal(plainText.getBytes());
+    return Base64.getEncoder().encodeToString(encryptedBytes);
+  }
+
+public static String decrypt(String encryptedText, SecretKey secretKey) throws Exception {
+  Cipher cipher = Cipher.getInstance(ALGORITHM);
+  cipher.init(Cipher.DECRYPT_MODE, secretKey);
+  byte[] decodedBytes = Base64.getDecoder().decode(encryptedText);
+  byte[] decryptedBytes = cipher.doFinal(decodedBytes);
+  return new String(decryptedBytes);
+}
+public static SecretKey getKeyFromPassword(String password) {
+  byte[] keyBytes = password.getBytes();
+  byte[] keyBytes16 = new byte[16];
+  System.arraycopy(keyBytes, 0, keyBytes16, 0, Math.min(keyBytes.length, keyBytes16.length));
+  return new SecretKeySpec(keyBytes16, ALGORITHM);
+}
+
+@SuppressWarnings("ConvertToTryWithResources")
+public static void main(String[] args) {
+  Scanner scanner = new Scanner(System.in);
+  try {
+    System.out.print("Enter text to encrypt: ");
+    String inputText = scanner.nextLine();
+
+    System.out.print("Enter a secret password (used as encryption key): ");
+    String password = scanner.nextLine();
+
+    SecretKey secretKey = getKeyFromPassword(password);
+
+    String encryptedText = encrypt(inputText, secretKey);
+    System.out.println("Encrypted Text: " + encryptedText);
+
+    String decryptedText = decrypt(encryptedText, secretKey);
+    System.out.println("Decrypted Text: " + decryptedText);
+} 
+
+catch (Exception e) {
+  e.printStackTrace();
+} 
+finally {
+  scanner.close();
+    }
+  }
+}
